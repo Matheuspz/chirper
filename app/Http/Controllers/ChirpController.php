@@ -12,7 +12,7 @@ class ChirpController extends Controller
      */
     public function index()
     {
-        $chirps = Chirp::with('users')
+        $chirps = Chirp::with('user')
             ->latest()
             ->take(50)
             ->get();
@@ -33,7 +33,18 @@ class ChirpController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validate = $request->validate([
+            'message' => 'required|string|max:255',
+        ],  [
+            'message.required' => 'Please write something to chirp!',
+            'message.max' => 'Chirps must be 255 characters or less.',
+        ]);
+
+        Chirp::create([
+            'message' => $validate['message'],
+        ]);
+
+        return redirect('/')->with('success', 'Your Chirp has been added!');
     }
 
     /**
